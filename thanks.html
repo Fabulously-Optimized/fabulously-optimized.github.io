@@ -5,6 +5,7 @@
     <title>Give thanks to Fabulously Optimized</title>
     <style>
         body { font-family: BlinkMacSystemFont,-apple-system,"Segoe UI",Roboto,Oxygen,Ubuntu,Cantarell,"Fira Sans","Droid Sans","Helvetica Neue",Helvetica,Arial,sans-serif; }
+        li img { width: 1em; height: 1em; margin-right: 0.5em; }
         a { color: blue; text-decoration: none; }
         a:hover { text-decoration: underline; }
     </style>
@@ -96,6 +97,14 @@
                 if (project.donation_urls && project.donation_urls.length > 0) {
                     const li = document.createElement('li');
 
+                    // Create an img element for the project icon
+                    if (project.icon_url) {
+                        const img = document.createElement('img');
+                        img.src = project.icon_url;
+                        img.alt = `${project.title} icon`;
+                        li.appendChild(img);
+                    }
+
                     if (project.donation_urls.length === 1) {
                         // Single donation link
                         const link = document.createElement('a');
@@ -105,8 +114,8 @@
                         li.appendChild(link);
                     } else {
                         // Multiple donation links
-                        const title = document.createTextNode(project.title + ': ');
-                        li.appendChild(title);
+                        const titleText = document.createTextNode(project.title + ': ');
+                        li.appendChild(titleText);
 
                         project.donation_urls.forEach((donation, index) => {
                             if (index > 0) li.appendChild(document.createTextNode(', '));
