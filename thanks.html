@@ -2,16 +2,128 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta http-equiv="refresh" content="0; url=https://github.com/Fabulously-Optimized/fabulously-optimized/blob/main/CONTRIBUTING.md" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="canonical" href="https://github.com/Fabulously-Optimized/fabulously-optimized/blob/main/CONTRIBUTING.md"/>
-    <title>Fabulously Optimized</title>
+    <title>Give thanks to Fabulously Optimized</title>
+    <style>
+        body { font-family: BlinkMacSystemFont,-apple-system,"Segoe UI",Roboto,Oxygen,Ubuntu,Cantarell,"Fira Sans","Droid Sans","Helvetica Neue",Helvetica,Arial,sans-serif; }
+        a { color: blue; text-decoration: none; }
+        a:hover { text-decoration: underline; }
+    </style>
 </head>
 <body>
-<script>
-    window.location.href = "https://github.com/Fabulously-Optimized/fabulously-optimized/blob/main/CONTRIBUTING.md";
-</script>
-<a href="https://github.com/Fabulously-Optimized/fabulously-optimized/blob/main/CONTRIBUTING.md">Click to redirect</a>
+    <h1>Give thanks to Fabulously Optimized</h1>
+    <p>So you like the modpack and want to support it? Thank you!</p>
+
+    <h2>The mods</h2>
+    <p>While Fabulously Optimized itself does not take direct donations, there are many mods in it that do.<br>
+        Here's a list of mods that take donations, click to redirect to the donation page.</p>
+    <ul id="projects"></ul>
+    <p><a href="https://download.fo/mods">What do each of the mods do?</a></p>
+    <p>Modders: this list is automatically fetched from Modrinth for the latest stable version of the modpack. All you have to do is add a donation link to your project!</p>
+        
+    <h2>The modpack</h2>
+    <p>There are also several ways you can support the modpack:</p>
+
+    <ul>
+    <li>
+        <strong>▶️ Play using the <a href="https://download.fo/curseforge">CurseForge App</a> or <a href="https://download.fo/modrinth">Modrinth App</a></strong>
+        <ul>
+        <li>Using either of these launchers gives the pack and mod devs money, other launchers currently do not.</li>
+        <li><a href="https://download.fo/install">How to install?</a></li>
+        </ul>
+    </li>
+    <li>
+        <strong><a href="https://download.fo/rate">❤️ Heart and comment on AlternativeTo</a></strong>
+        <ul>
+        <li>Please sign up before doing it, otherwise it will not count ☹️</li>
+        </ul>
+    </li>
+    <li>
+        <strong><a href="https://wiki.download.fo/readme/free-cape">🦸 Get a free FO cape</a></strong>
+    </li>
+    <li>
+        <strong><a href="https://docs.modrinth.com/docs/details/ads/#browser-extensions">🛑 Disable ad blocker on Modrinth</a> and <a href="https://modrinth.com/user/robotkoer">check out my other projects</a></strong>
+    </li>
+    <li>
+        <strong><a href="https://download.fo/host">🗄️ Create a Minecraft server (25% off first month!)</a></strong>
+    </li>
+    <li>
+        <strong>🔗 Tell your friends to <a href="https://download.fo">download.fo</a> by sharing the link!</strong>
+    </li>
+    </ul>
+
+    <h2>Contribute</h2>
+    <p>And if you'd like to do even more, you can always test, write and translate!</p>
+    <ul>
+    <li>
+        <strong><a href="https://github.com/Fabulously-Optimized/fabulously-optimized/issues?q=is%3Aissue+is%3Aopen+label%3A%22feedback%2Ftesters+wanted%22">🧪 Test mods that are planned to be included</a></strong>
+    </li>
+    <li>
+        <strong><a href="https://download.fo/translate">🌐 Translate the modpack and mods</a></strong>
+    </li>
+    <li>
+        <strong><a href="https://github.com/Fabulously-Optimized/wiki/issues">📝 Contribute to the wiki</a></strong>
+    </li>
+    <li>
+        <strong><a href="https://github.com/Fabulously-Optimized/fabulously-optimized/labels/help%20wanted">🧑‍💻 Help with programming things</a></strong>
+    </li>
+    </ul>
+
+    <script>
+        async function fetchProjectVersions() {
+            const response = await fetch(`https://api.modrinth.com/v2/project/1KVo5zza/version?featured=true`);
+            const versions = await response.json();
+            return versions.find(version => version.version_type === "release");
+        }
+
+        async function fetchProjectDetails(projectIds) {
+            const response = await fetch(`https://api.modrinth.com/v2/projects?ids=[${projectIds.map(id => `"${id}"`).join(',')}]`);
+            return response.json();
+        }
+
+        async function displayProjects() {
+            const version = await fetchProjectVersions();
+            if (!version || !version.dependencies) return; // Exit if no version or dependencies found
+            
+            const projectIds = version.dependencies.map(dep => dep.project_id).filter(id => id); // Filter out falsy values
+            const projectDetails = await fetchProjectDetails(projectIds);
+
+            // Sort projects by title
+            projectDetails.sort((a, b) => a.title.localeCompare(b.title));
+
+            const projectsList = document.getElementById('projects');
+
+            projectDetails.forEach(project => {
+                if (project.donation_urls && project.donation_urls.length > 0) {
+                    const li = document.createElement('li');
+
+                    if (project.donation_urls.length === 1) {
+                        // Single donation link
+                        const link = document.createElement('a');
+                        link.href = project.donation_urls[0].url;
+                        link.textContent = project.title;
+                        link.target = "_blank";
+                        li.appendChild(link);
+                    } else {
+                        // Multiple donation links
+                        const title = document.createTextNode(project.title + ': ');
+                        li.appendChild(title);
+
+                        project.donation_urls.forEach((donation, index) => {
+                            if (index > 0) li.appendChild(document.createTextNode(', '));
+                            const link = document.createElement('a');
+                            link.href = donation.url;
+                            link.textContent = donation.platform;
+                            link.target = "_blank";
+                            li.appendChild(link);
+                        });
+                    }
+
+                    projectsList.appendChild(li);
+                }
+            });
+        }
+
+        displayProjects();
+    </script>
 </body>
 </html>
